@@ -35,6 +35,7 @@ class Particle {
       x: Math.random() - 0.5 * 2,
       y: Math.random() - 0.5 * 2,
     };
+    this.mass = 1;
   }
 
   draw() {
@@ -58,7 +59,8 @@ class Particle {
           this.radius * 2 <
         0
       ) {
-        console.log("collided");
+        utils.resolveCollision(this, particles[i]);
+        // console.log("collided");
       }
     }
     //to make collision with canvas width and height
@@ -120,3 +122,11 @@ function animate() {
 }
 
 animate();
+
+function rotate(velocity, angle) {
+  const rotatedVelocity = {
+    x: velocity.x * Math.cos(angle) - velocity.y * Math.sin(angle),
+    y: velocity.x * Math.sin(angle) + velocity.y * Math.cos(angle),
+  };
+  return rotatedVelocity;
+}
