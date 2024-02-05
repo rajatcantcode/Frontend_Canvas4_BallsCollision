@@ -23,6 +23,7 @@ function rotate(velocity, angle) {
 
 //added
 
+// One-dimensional Newtonian
 // Function to resolve collision between two particles
 function resolveCollision(particle, otherParticle) {
   // Calculate velocity differences and distances

@@ -7,8 +7,8 @@ canvas.width = innerWidth;
 canvas.height = innerHeight;
 
 const mouse = {
-  x: innerWidth / 2,
-  y: innerHeight / 2,
+  x: -100,
+  y: -100,
 };
 
 const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
@@ -32,15 +32,23 @@ class Particle {
     this.radius = radius;
     this.color = color;
     this.velocity = {
-      x: Math.random() - 0.5 * 2,
-      y: Math.random() - 0.5 * 2,
+      x: Math.random() - 0.5 * 4,
+      y: Math.random() - 0.5 * 4,
     };
     this.mass = 1;
+    this.opacity = 0;
   }
 
   draw() {
     c.beginPath();
     c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+    //We are actually saving our alpha value
+    c.save();
+    c.globalAlpha = this.opacity;
+    c.fillStyle = this.color;
+    c.fill();
+    c.restore();
+    //----
     c.strokestyle = this.color;
     c.stroke();
     c.closePath();
@@ -53,14 +61,12 @@ class Particle {
       if (this === particles[i]) {
         continue;
       }
-
       if (
         utils.distance(this.x, this.y, particles[i].x, particles[i].y) -
           this.radius * 2 <
         0
       ) {
         utils.resolveCollision(this, particles[i]);
-        // console.log("collided");
       }
     }
     //to make collision with canvas width and height
@@ -69,6 +75,18 @@ class Particle {
     }
     if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
       this.velocity.y = -this.velocity.y;
+    }
+
+    //mouse collision detection
+    if (
+      utils.distance(mouse.x, mouse.y, this.x, this.y) < 80 &&
+      this.opacity < 2
+    ) {
+      // console.log("collided");
+      this.opacity += 0.2;
+    } else if (this.opacity > 0) {
+      this.opacity -= 0.2;
+      this.opacity = Math.max(0, this.opacity);
     }
 
     this.x += this.velocity.x;
@@ -81,13 +99,13 @@ let particles;
 function init() {
   particles = [];
 
-  for (let i = 0; i < 5; i++) {
-    let radius = 100;
+  for (let i = 0; i < 60; i++) {
+    let radius = 20;
     //more efficient they will spawn within canvas boundary
     let x = utils.randomIntFromRange(radius, canvas.width - radius);
     let y = utils.randomIntFromRange(radius, canvas.height - radius);
 
-    let color = "blue";
+    let color = utils.randomColor(colors);
 
     if (i !== 0) {
       for (let j = 0; j < particles.length; j++) {
@@ -123,10 +141,14 @@ function animate() {
 
 animate();
 
-function rotate(velocity, angle) {
-  const rotatedVelocity = {
-    x: velocity.x * Math.cos(angle) - velocity.y * Math.sin(angle),
-    y: velocity.x * Math.sin(angle) + velocity.y * Math.cos(angle),
-  };
-  return rotatedVelocity;
-}
+//Mobile Event listener
+// Mobile functionality
+canvas.addEventListener("touchmove", (e) => {
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+});
+
+canvas.addEventListener("touchend", () => {
+  mouse.x = undefined;
+  mouse.y = undefined;
+});
