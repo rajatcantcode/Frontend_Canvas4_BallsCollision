@@ -1,5 +1,4 @@
 import utils from "./utils.js";
-console.log(utils);
 
 const canvas = document.querySelector("canvas");
 const c = canvas.getContext("2d");
@@ -23,7 +22,6 @@ addEventListener("mousemove", (event) => {
 addEventListener("resize", () => {
   canvas.width = innerWidth;
   canvas.height = innerHeight;
-
   init();
 });
 
@@ -33,6 +31,10 @@ class Particle {
     this.y = y;
     this.radius = radius;
     this.color = color;
+    this.velocity = {
+      x: Math.random() - 0.5,
+      y: Math.random() - 0.5,
+    };
   }
 
   draw() {
@@ -43,8 +45,24 @@ class Particle {
     c.closePath();
   }
 
-  update() {
+  update(particles) {
     this.draw();
+
+    for (let i = 0; i < particles.length; i++) {
+      if (this === particles[i]) {
+        continue;
+      }
+
+      if (
+        utils.distance(this.x, this.y, particles[i].x, particles[i].y) -
+          this.radius * 2 <
+        0
+      ) {
+        console.log("collided");
+      }
+    }
+    this.x += this.velocity.x;
+    this.y += this.velocity.y;
   }
 }
 
@@ -80,6 +98,7 @@ function init() {
     particles.push(new Particle(x, y, radius, color));
   }
 }
+init();
 
 // Animation Loop
 function animate() {
@@ -87,9 +106,9 @@ function animate() {
   c.clearRect(0, 0, canvas.width, canvas.height);
 
   particles.forEach((particle) => {
-    particle.update();
+    //sending particles array in order to check particle collision
+    particle.update(particles);
   });
 }
 
-init();
 animate();
