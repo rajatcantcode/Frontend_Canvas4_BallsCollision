@@ -32,8 +32,8 @@ class Particle {
     this.radius = radius;
     this.color = color;
     this.velocity = {
-      x: Math.random() - 0.5,
-      y: Math.random() - 0.5,
+      x: Math.random() - 0.5 * 2,
+      y: Math.random() - 0.5 * 2,
     };
   }
 
@@ -61,6 +61,14 @@ class Particle {
         console.log("collided");
       }
     }
+    //to make collision with canvas width and height
+    if (this.x - this.radius <= 0 || this.x + this.radius >= canvas.width) {
+      this.velocity.x = -this.velocity.x;
+    }
+    if (this.y - this.radius <= 0 || this.y + this.radius >= canvas.height) {
+      this.velocity.y = -this.velocity.y;
+    }
+
     this.x += this.velocity.x;
     this.y += this.velocity.y;
   }
